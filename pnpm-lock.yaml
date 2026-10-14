@@ -17,6 +17,9 @@ importers:
       '@prisma/adapter-pg':
         specifier: ^7.10.0
         version: 7.10.0
+      '@prisma/client':
+        specifier: 8.1.0-dev.7
+        version: 8.1.0-dev.7(prisma@8.1.0-dev.7(@types/node@20.19.43)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(typescript@5.9.3))(typescript@5.9.3)
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -690,6 +693,21 @@ packages:
 
   '@prisma/adapter-pg@7.10.0':
     resolution: {integrity: sha512-N7nwSor0HO1Kz6xBv0TPAjAPysKK0fac6p4fVN3ensLOuzc/83Fgmln5k92eK/cvzqdkSR/2kkAqlbcdwVrwpw==}
+
+  '@prisma/client-runtime-utils@8.1.0-dev.7':
+    resolution: {integrity: sha512-G4AK3bABh6VTRqT6u3tXZqxH+av0L1+iNpcd3fapQF/0vIHCIzKeNJJaWZK0daDyjDrbv8vznCS7X7Xko5pwAQ==}
+
+  '@prisma/client@8.1.0-dev.7':
+    resolution: {integrity: sha512-GnSRNi9m2EDYcGDauxY6qK3Lum9jU2EAyn/o2tJvWTKuWkzR0nt/UJZU25DxusChuD3lQLJOQVbTh1saMSR1eg==}
+    engines: {node: ^20.19 || ^22.12 || >=24.0}
+    peerDependencies:
+      prisma: '*'
+      typescript: '>=5.4.0'
+    peerDependenciesMeta:
+      prisma:
+        optional: true
+      typescript:
+        optional: true
 
   '@prisma/config@8.1.0-dev.7':
     resolution: {integrity: sha512-dUtcHCurccOgyJIx7zdmJJZTGdCvisl5DNDlgT7wAH0BHpM9+8evp1cCuFy2LkG6aO8Pks76PP8eoWJtPqw9+w==}
@@ -4581,6 +4599,15 @@ snapshots:
       postgres-array: 3.0.4
     transitivePeerDependencies:
       - pg-native
+
+  '@prisma/client-runtime-utils@8.1.0-dev.7': {}
+
+  '@prisma/client@8.1.0-dev.7(prisma@8.1.0-dev.7(@types/node@20.19.43)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(typescript@5.9.3))(typescript@5.9.3)':
+    dependencies:
+      '@prisma/client-runtime-utils': 8.1.0-dev.7
+    optionalDependencies:
+      prisma: 8.1.0-dev.7(@types/node@20.19.43)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(typescript@5.9.3)
+      typescript: 5.9.3
 
   '@prisma/config@8.1.0-dev.7':
     dependencies:

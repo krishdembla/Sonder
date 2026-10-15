@@ -4,6 +4,13 @@ import { useCallback, useEffect, useRef, useState, useTransition } from "react"
 import { MessageRole } from "@/lib/generated/prisma/enums"
 import { MODELS, labelFor } from "@/lib/models/registry"
 import { updateConversationModel } from "@/app/(patient)/chat/actions"
+import { CRISIS_FOLLOWUP } from "@/lib/guardrails"
+import {
+  CrisisButton,
+  type CrisisButtonHandle,
+} from "@/components/safety/CrisisButton"
+import { QuickExit } from "@/components/safety/QuickExit"
+import { AboutButton } from "@/components/safety/AboutButton"
 
 type DisplayMessage = {
   id: string
@@ -47,10 +54,14 @@ export function Chat({
   const [switchNotice, setSwitchNotice] = useState<string | null>(null)
   const [, startModelTransition] = useTransition()
 
+  const [crisisActive, setCrisisActive] = useState(false)
+
   const pendingRef = useRef<string[]>([])
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const abortRef = useRef<AbortController | null>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
+  const crisisButtonRef = useRef<CrisisButtonHandle>(null)
+  const crisisTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -127,6 +138,19 @@ export function Chat({
             ])
             setStreamingContent("")
             setIsStreaming(false)
+            setCrisisActive(true)
+            if (crisisTimerRef.current) clearTimeout(crisisTimerRef.current)
+            crisisTimerRef.current = setTimeout(() => {
+              setMessages((prev) => [
+                ...prev,
+                {
+                  id: crypto.randomUUID(),
+                  role: "crisis",
+                  content: CRISIS_FOLLOWUP,
+                },
+              ])
+              crisisButtonRef.current?.open()
+            }, 45_000)
             break outer
           } else if (event.type === "error") {
             setError("Something went wrong. Please try again.")
@@ -152,6 +176,10 @@ export function Chat({
     setError(null)
 
     abortRef.current?.abort()
+    if (crisisTimerRef.current) {
+      clearTimeout(crisisTimerRef.current)
+      crisisTimerRef.current = null
+    }
 
     setMessages((prev) => [
       ...prev,
@@ -178,9 +206,11 @@ export function Chat({
     const newId = e.target.value
     if (newId === currentModelId) return
     setCurrentModelId(newId)
-    setSwitchNotice(
-      `Now talking with ${labelFor(newId)}. Everything you have shared so far is still here.`
-    )
+    if (!crisisActive) {
+      setSwitchNotice(
+        `Now talking with ${labelFor(newId)}. Everything you have shared so far is still here.`
+      )
+    }
     startModelTransition(async () => {
       await updateConversationModel(conversationId, newId)
     })
@@ -190,10 +220,15 @@ export function Chat({
 
   return (
     <div className="flex h-full flex-col">
+      <CrisisButton ref={crisisButtonRef} />
+      <QuickExit />
       <div className="flex items-center justify-between border-b px-4 py-2">
-        <span className="text-sm font-medium text-muted-foreground">
-          {avatar ?? "Companion"}
-        </span>
+        <div className="flex items-center gap-3">
+          <span className="text-sm font-medium text-muted-foreground">
+            {avatar ?? "Companion"}
+          </span>
+          <AboutButton />
+        </div>
         <select
           value={currentModelId}
           onChange={handleModelChange}

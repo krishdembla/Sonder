@@ -10,7 +10,9 @@ export default defineConfig({
     },
   },
   test: {
+    globals: true,
     environment: "node",
+    setupFiles: ["./vitest.setup.ts"],
     include: ["**/*.test.ts", "**/*.test.tsx"],
     exclude: ["node_modules", ".next", "lib/generated"],
   },

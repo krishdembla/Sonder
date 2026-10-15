@@ -19,8 +19,17 @@ export default async function ChatPage({
     messages = await getMessages(profile, id)
   } catch (err) {
     if (err instanceof ForbiddenError) notFound()
+    if ((err as { code?: string }).code === "P2025") notFound()
     throw err
   }
 
-  return <Chat conversationId={conv.id} initialMessages={messages} />
+  const setup = (conv.setup as { avatar?: string; userName?: string }) ?? {}
+
+  return (
+    <Chat
+      conversationId={conv.id}
+      initialMessages={messages}
+      avatar={setup.avatar}
+    />
+  )
 }

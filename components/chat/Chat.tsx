@@ -21,9 +21,11 @@ const HOLD_AFTER_COMPLETE_MS = 300
 export function Chat({
   conversationId,
   initialMessages,
+  avatar,
 }: {
   conversationId: string
   initialMessages: InitialMessage[]
+  avatar?: string
 }) {
   const [messages, setMessages] = useState<DisplayMessage[]>(() =>
     initialMessages.map((m) => ({
@@ -168,10 +170,10 @@ export function Chat({
   const canSubmit = input.trim().length > 0 && !held
 
   return (
-    <div className="flex h-dvh flex-col">
+    <div className="flex h-full flex-col">
       <div className="flex-1 space-y-4 overflow-y-auto p-4">
         {messages.map((m) => (
-          <MessageBubble key={m.id} message={m} />
+          <MessageBubble key={m.id} message={m} avatar={avatar} />
         ))}
         {isStreaming && streamingContent && (
           <div className="flex justify-start">
@@ -215,7 +217,13 @@ export function Chat({
   )
 }
 
-function MessageBubble({ message }: { message: DisplayMessage }) {
+function MessageBubble({
+  message,
+  avatar,
+}: {
+  message: DisplayMessage
+  avatar?: string
+}) {
   if (message.role === "crisis") {
     return (
       <div className="rounded-2xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
@@ -225,7 +233,12 @@ function MessageBubble({ message }: { message: DisplayMessage }) {
   }
   const isUser = message.role === "user"
   return (
-    <div className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
+    <div
+      className={`flex flex-col gap-1 ${isUser ? "items-end" : "items-start"}`}
+    >
+      {!isUser && avatar && (
+        <span className="px-1 text-xs text-muted-foreground">{avatar}</span>
+      )}
       <div
         className={`max-w-[75%] rounded-2xl px-4 py-2 text-sm ${
           isUser

@@ -30,6 +30,7 @@ export default async function ChatPage({
       conversationId={conv.id}
       initialMessages={messages}
       avatar={setup.avatar}
+      initialModelId={conv.modelId}
     />
   )
 }

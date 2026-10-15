@@ -6,7 +6,7 @@ import { requireRole } from "@/lib/auth"
 import { prisma } from "@/lib/db"
 import { getConversation } from "@/lib/db/queries"
 import { Role, MessageRole } from "@/lib/generated/prisma/enums"
-import { LLAMA } from "@/lib/models/registry"
+import { LLAMA, resolve } from "@/lib/models/registry"
 
 export const AVATAR_NAMES = ["Cloud", "Ember", "Moon", "Heart"] as const
 export type AvatarName = (typeof AVATAR_NAMES)[number]
@@ -63,4 +63,17 @@ export async function deleteConversation(conversationId: string) {
   await getConversation(profile, conversationId)
   await prisma.conversation.delete({ where: { id: conversationId } })
   revalidatePath("/chat", "layout")
+}
+
+export async function updateConversationModel(
+  conversationId: string,
+  modelId: string
+) {
+  const profile = await requireRole([Role.PATIENT, Role.ADMIN])
+  await getConversation(profile, conversationId)
+  const resolvedId = resolve(modelId)
+  await prisma.conversation.update({
+    where: { id: conversationId },
+    data: { modelId: resolvedId },
+  })
 }

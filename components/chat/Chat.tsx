@@ -1,7 +1,9 @@
 "use client"
 
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState, useTransition } from "react"
 import { MessageRole } from "@/lib/generated/prisma/enums"
+import { MODELS, labelFor } from "@/lib/models/registry"
+import { updateConversationModel } from "@/app/(patient)/chat/actions"
 
 type DisplayMessage = {
   id: string
@@ -22,10 +24,12 @@ export function Chat({
   conversationId,
   initialMessages,
   avatar,
+  initialModelId,
 }: {
   conversationId: string
   initialMessages: InitialMessage[]
   avatar?: string
+  initialModelId?: string
 }) {
   const [messages, setMessages] = useState<DisplayMessage[]>(() =>
     initialMessages.map((m) => ({
@@ -39,6 +43,9 @@ export function Chat({
   const [error, setError] = useState<string | null>(null)
   const [held, setHeld] = useState(false)
   const [input, setInput] = useState("")
+  const [currentModelId, setCurrentModelId] = useState(initialModelId ?? "")
+  const [switchNotice, setSwitchNotice] = useState<string | null>(null)
+  const [, startModelTransition] = useTransition()
 
   const pendingRef = useRef<string[]>([])
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -167,11 +174,44 @@ export function Chat({
     [handleSubmit]
   )
 
+  function handleModelChange(e: React.ChangeEvent<HTMLSelectElement>) {
+    const newId = e.target.value
+    if (newId === currentModelId) return
+    setCurrentModelId(newId)
+    setSwitchNotice(
+      `Now talking with ${labelFor(newId)}. Everything you have shared so far is still here.`
+    )
+    startModelTransition(async () => {
+      await updateConversationModel(conversationId, newId)
+    })
+  }
+
   const canSubmit = input.trim().length > 0 && !held
 
   return (
     <div className="flex h-full flex-col">
+      <div className="flex items-center justify-between border-b px-4 py-2">
+        <span className="text-sm font-medium text-muted-foreground">
+          {avatar ?? "Companion"}
+        </span>
+        <select
+          value={currentModelId}
+          onChange={handleModelChange}
+          className="rounded-lg border bg-background px-2 py-1 text-xs outline-none focus:ring-2 focus:ring-ring"
+        >
+          {Object.entries(MODELS).map(([id, spec]) => (
+            <option key={id} value={id}>
+              {spec.label}
+            </option>
+          ))}
+        </select>
+      </div>
       <div className="flex-1 space-y-4 overflow-y-auto p-4">
+        {switchNotice && (
+          <p className="text-center text-xs text-muted-foreground">
+            {switchNotice}
+          </p>
+        )}
         {messages.map((m) => (
           <MessageBubble key={m.id} message={m} avatar={avatar} />
         ))}

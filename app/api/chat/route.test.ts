@@ -23,11 +23,14 @@ vi.mock("@/lib/db/queries", async (orig) => {
 })
 
 vi.mock("@/lib/models/llama", () => ({ llamaStream: vi.fn() }))
+vi.mock("@/lib/models/mistral", () => ({ mistralStream: vi.fn() }))
 
 import { getCurrentProfile } from "@/lib/auth"
 import { prisma } from "@/lib/db"
 import { getConversation } from "@/lib/db/queries"
 import { llamaStream } from "@/lib/models/llama"
+import { mistralStream } from "@/lib/models/mistral"
+import { MISTRAL } from "@/lib/models/registry"
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -308,4 +311,24 @@ it("does not store assistant message when request is aborted mid-stream", async 
       (arg as { data: { role: string } }).data.role === MessageRole.ASSISTANT
   )
   expect(assistantCreates).toHaveLength(0)
+})
+
+// ─── Model routing ────────────────────────────────────────────────────────────
+
+it("routes to mistralStream when conversation modelId is MISTRAL", async () => {
+  vi.mocked(getCurrentProfile).mockResolvedValue(patientProfile)
+  vi.mocked(getConversation).mockResolvedValue({
+    ...conv,
+    modelId: MISTRAL,
+  } as never)
+  vi.mocked(mistralStream).mockImplementation(async function* () {
+    yield "Mistral reply"
+  })
+
+  const events = await readSSE(
+    await POST(makeRequest({ conversationId: "conv_1", messages: ["hi"] }))
+  )
+  expect(mistralStream).toHaveBeenCalled()
+  expect(llamaStream).not.toHaveBeenCalled()
+  expect(events).toContainEqual({ type: "token", content: "Mistral reply" })
 })

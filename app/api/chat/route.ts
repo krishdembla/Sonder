@@ -5,6 +5,8 @@ import { getConversation, ForbiddenError } from "@/lib/db/queries"
 import { isCrisis, CRISIS_RESPONSE } from "@/lib/guardrails"
 import { forModel } from "@/lib/history"
 import { llamaStream } from "@/lib/models/llama"
+import { mistralStream } from "@/lib/models/mistral"
+import { MISTRAL } from "@/lib/models/registry"
 import { MessageRole } from "@/lib/generated/prisma/enums"
 
 const SSE_HEADERS = {
@@ -60,9 +62,11 @@ async function* chatSSE(
     }))
   )
 
+  const streamFn = modelId === MISTRAL ? mistralStream : llamaStream
+
   let assistantContent = ""
   try {
-    for await (const chunk of llamaStream(history, signal)) {
+    for await (const chunk of streamFn(history, signal)) {
       if (signal.aborted) break
       assistantContent += chunk
       yield sseChunk({ type: "token", content: chunk })

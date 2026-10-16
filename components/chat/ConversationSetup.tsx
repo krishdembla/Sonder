@@ -1,12 +1,8 @@
 "use client"
 
 import { useState, useTransition } from "react"
-import Image from "next/image"
-import {
-  AVATAR_NAMES,
-  createConversationWithSetup,
-  type AvatarName,
-} from "@/app/(patient)/chat/actions"
+import { AVATAR_NAMES, type AvatarName } from "@/lib/avatars"
+import { createConversationWithSetup } from "@/app/(patient)/chat/actions"
 
 const AVATAR_IMAGES: Record<AvatarName, string> = {
   Cloud: "/avatars/cloud.png",
@@ -18,18 +14,19 @@ const AVATAR_IMAGES: Record<AvatarName, string> = {
 export function ConversationSetup() {
   const [avatar, setAvatar] = useState<AvatarName | null>(null)
   const [userName, setUserName] = useState("")
+  const [conversationTitle, setConversationTitle] = useState("")
   const [isPending, startTransition] = useTransition()
 
   function handleSubmit() {
     if (!avatar) return
     startTransition(async () => {
-      await createConversationWithSetup(avatar, userName)
+      await createConversationWithSetup(avatar, userName, conversationTitle)
     })
   }
 
   return (
     <div className="flex h-full items-center justify-center p-8">
-      <div className="w-full max-w-md space-y-8">
+      <div className="w-full max-w-md space-y-6">
         <div className="text-center">
           <h1 className="text-2xl font-semibold">Choose your companion</h1>
           <p className="mt-2 text-sm text-muted-foreground">
@@ -48,7 +45,8 @@ export function ConversationSetup() {
                   : "border-border hover:border-primary/50"
               }`}
             >
-              <Image
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
                 src={AVATAR_IMAGES[name]}
                 alt={name}
                 width={48}
@@ -58,6 +56,26 @@ export function ConversationSetup() {
               <span className="text-xs font-medium">{name}</span>
             </button>
           ))}
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium" htmlFor="conversation-title">
+            Conversation name{" "}
+            <span className="text-muted-foreground">(optional)</span>
+          </label>
+          <input
+            id="conversation-title"
+            type="text"
+            value={conversationTitle}
+            onChange={(e) => setConversationTitle(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleSubmit()
+            }}
+            placeholder={
+              avatar ? `${avatar} – my session` : "Give this session a name"
+            }
+            className="w-full rounded-xl border bg-background px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
+          />
         </div>
 
         <div className="space-y-2">
@@ -81,7 +99,7 @@ export function ConversationSetup() {
         <button
           onClick={handleSubmit}
           disabled={!avatar || isPending}
-          className="w-full rounded-xl bg-primary py-2 text-sm font-medium text-primary-foreground disabled:opacity-50"
+          className="w-full rounded-xl bg-primary py-2.5 text-sm font-medium text-primary-foreground shadow-sm disabled:opacity-50"
         >
           {isPending ? "Starting..." : "Start conversation"}
         </button>

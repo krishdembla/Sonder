@@ -7,9 +7,7 @@ import { prisma } from "@/lib/db"
 import { getConversation } from "@/lib/db/queries"
 import { Role, MessageRole } from "@/lib/generated/prisma/enums"
 import { LLAMA, resolve } from "@/lib/models/registry"
-
-export const AVATAR_NAMES = ["Cloud", "Ember", "Moon", "Heart"] as const
-export type AvatarName = (typeof AVATAR_NAMES)[number]
+import type { AvatarName } from "@/lib/avatars"
 
 function greetingText(userName: string): string {
   const who = userName.trim() ? `, ${userName.trim()}` : ""
@@ -21,13 +19,15 @@ function greetingText(userName: string): string {
 
 export async function createConversationWithSetup(
   avatar: AvatarName,
-  userName: string
+  userName: string,
+  conversationTitle: string
 ) {
   const profile = await requireRole([Role.PATIENT, Role.ADMIN])
+  const title = conversationTitle.trim() || avatar
   const conv = await prisma.conversation.create({
     data: {
       userId: profile.id,
-      title: avatar,
+      title,
       modelId: LLAMA,
       setup: { avatar, userName: userName.trim() },
     },

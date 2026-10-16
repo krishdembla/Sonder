@@ -19,7 +19,7 @@ vi.mock("next/navigation", () => ({
 
 import { Chat } from "./Chat"
 
-const QUIET_WINDOW_MS = 2500
+const QUIET_WINDOW_MS = 4500
 
 function makeCrisisStream(content: string): Response {
   const encoder = new TextEncoder()

@@ -24,7 +24,7 @@ type InitialMessage = {
   content: string
 }
 
-const QUIET_WINDOW_MS = 2500
+const QUIET_WINDOW_MS = 4500
 const HOLD_AFTER_COMPLETE_MS = 300
 
 export function Chat({
@@ -229,17 +229,20 @@ export function Chat({
           </span>
           <AboutButton />
         </div>
-        <select
-          value={currentModelId}
-          onChange={handleModelChange}
-          className="rounded-lg border bg-background px-2 py-1 text-xs outline-none focus:ring-2 focus:ring-ring"
-        >
-          {Object.entries(MODELS).map(([id, spec]) => (
-            <option key={id} value={id}>
-              {spec.label}
-            </option>
-          ))}
-        </select>
+        <div className="flex items-center gap-1.5">
+          <span className="text-xs text-muted-foreground">Model</span>
+          <select
+            value={currentModelId}
+            onChange={handleModelChange}
+            className="rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground shadow-sm outline-none focus:ring-2 focus:ring-ring"
+          >
+            {Object.entries(MODELS).map(([id, spec]) => (
+              <option key={id} value={id}>
+                {spec.label}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
       <div className="flex-1 space-y-4 overflow-y-auto p-4">
         {switchNotice && (
@@ -250,17 +253,24 @@ export function Chat({
         {messages.map((m) => (
           <MessageBubble key={m.id} message={m} avatar={avatar} />
         ))}
-        {isStreaming && streamingContent && (
-          <div className="flex justify-start">
-            <div className="max-w-[75%] rounded-2xl bg-muted px-4 py-2 text-sm">
-              {streamingContent}
+        {isStreaming && (
+          <div className="flex flex-row gap-2">
+            <div className="flex-shrink-0 pt-1">
+              {avatar ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={`/avatars/${avatar.toLowerCase()}.png`}
+                  alt={avatar}
+                  width={32}
+                  height={32}
+                  className="rounded-full"
+                />
+              ) : (
+                <div className="h-8 w-8 rounded-full bg-muted" />
+              )}
             </div>
-          </div>
-        )}
-        {isStreaming && !streamingContent && (
-          <div className="flex justify-start">
-            <div className="rounded-2xl bg-muted px-4 py-2 text-sm">
-              <TypingIndicator />
+            <div className="max-w-[75%] rounded-2xl bg-card px-4 py-2 text-sm shadow-sm">
+              {streamingContent || <TypingIndicator />}
             </div>
           </div>
         )}
@@ -273,7 +283,17 @@ export function Chat({
         <div className="flex items-end gap-2">
           <textarea
             value={input}
-            onChange={(e) => setInput(e.target.value)}
+            onChange={(e) => {
+              setInput(e.target.value)
+              // Keep the quiet window alive while the user is actively typing.
+              // Only reschedule if a flush is already pending — don't start a
+              // new timer just from typing (that would delay messages for users
+              // who type before pressing Enter).
+              if (debounceRef.current) {
+                clearTimeout(debounceRef.current)
+                debounceRef.current = setTimeout(flushPending, QUIET_WINDOW_MS)
+              }
+            }}
             onKeyDown={handleKeyDown}
             placeholder="Type a message..."
             rows={1}
@@ -307,21 +327,38 @@ function MessageBubble({
     )
   }
   const isUser = message.role === "user"
+  const avatarSrc = avatar ? `/avatars/${avatar.toLowerCase()}.png` : null
   return (
-    <div
-      className={`flex flex-col gap-1 ${isUser ? "items-end" : "items-start"}`}
-    >
-      {!isUser && avatar && (
-        <span className="px-1 text-xs text-muted-foreground">{avatar}</span>
+    <div className={`flex gap-2 ${isUser ? "flex-row-reverse" : "flex-row"}`}>
+      {!isUser && (
+        <div className="flex-shrink-0 pt-1">
+          {avatarSrc ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={avatarSrc}
+              alt={avatar ?? ""}
+              width={32}
+              height={32}
+              className="rounded-full"
+            />
+          ) : (
+            <div className="h-8 w-8 rounded-full bg-muted" />
+          )}
+        </div>
       )}
-      <div
-        className={`max-w-[75%] rounded-2xl px-4 py-2 text-sm ${
-          isUser
-            ? "bg-primary text-primary-foreground"
-            : "bg-muted text-foreground"
-        }`}
-      >
-        {message.content}
+      <div className="flex max-w-[75%] flex-col gap-1">
+        {!isUser && avatar && (
+          <span className="px-1 text-xs text-muted-foreground">{avatar}</span>
+        )}
+        <div
+          className={`rounded-2xl px-4 py-2 text-sm ${
+            isUser
+              ? "bg-primary text-primary-foreground"
+              : "bg-card text-foreground shadow-sm"
+          }`}
+        >
+          {message.content}
+        </div>
       </div>
     </div>
   )

@@ -24,7 +24,7 @@ type InitialMessage = {
   content: string
 }
 
-const QUIET_WINDOW_MS = 4500
+const QUIET_WINDOW_MS = 5000
 const HOLD_AFTER_COMPLETE_MS = 300
 
 export function Chat({
@@ -161,7 +161,11 @@ export function Chat({
         }
       }
     } catch (err) {
-      if ((err as Error).name === "AbortError") return
+      if ((err as Error).name === "AbortError") {
+        setStreamingContent("")
+        setIsStreaming(false)
+        return
+      }
       setError("Could not reach the server. Please try again.")
       setStreamingContent("")
       setIsStreaming(false)

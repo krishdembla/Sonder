@@ -76,6 +76,17 @@ Acceptance: handler tests with a mocked vLLM stream; rewriter failure path retur
 - Client-side 45 s follow-up timer after a crisis message; sends `CRISIS_FOLLOWUP` once and opens the resources modal. Suppress the model-switch notice while a crisis is active.
 Acceptance: component tests for visibility rules; timer test with fake timers.
 
+## Deferred features (post-current-work)
+
+These features existed in the old app but are intentionally not being built now. Revisit once slices 7 polish and 8 are complete.
+
+| Feature | Old app behavior | Why deferred |
+|---|---|---|
+| Per-message feedback row (thumbs up/down + copy) | Visual-only in the old app; ratings and comments were never persisted (`public/app.js:229`) | Needs IRB documentation before any comments (which may contain mental health content) are stored; low priority while core chat is still being polished |
+| "Account created" toast | Fired once on first sign-in via `context.emitter.send_toast()` | Minor UX nicety; Clerk's own redirect flow is sufficient for now; add when there is a shadcn Toast component in place |
+
+---
+
 ## Slice 8: Clinician side
 Do not start this slice until Krish and Claude (chat) have written `docs/migration/05-clinician-spec.md` from the Phase 1 matrix. Planned parts, each its own session:
 - 8a Assignments and a clinician patient list.

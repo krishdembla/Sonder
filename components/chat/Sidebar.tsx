@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
+import { UserButton } from "@clerk/nextjs"
 import {
   renameConversation,
   deleteConversation,
@@ -50,6 +51,12 @@ export function Sidebar({
 
   return (
     <aside className="flex w-64 shrink-0 flex-col border-r bg-sidebar">
+      <div className="flex items-center justify-between border-b px-4 py-3">
+        <span className="text-base font-semibold tracking-tight text-foreground">
+          Sonder
+        </span>
+        <UserButton />
+      </div>
       <div className="p-3">
         <Link
           href="/chat"

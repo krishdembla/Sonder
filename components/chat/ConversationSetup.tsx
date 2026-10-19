@@ -26,9 +26,11 @@ export function ConversationSetup() {
 
   return (
     <div className="flex h-full items-center justify-center p-8">
-      <div className="w-full max-w-md space-y-6">
+      <div className="w-full max-w-sm space-y-7">
         <div className="text-center">
-          <h1 className="text-2xl font-semibold">Choose your companion</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">
+            Choose your companion
+          </h1>
           <p className="mt-2 text-sm text-muted-foreground">
             Pick an avatar, then start whenever you are ready.
           </p>
@@ -39,19 +41,21 @@ export function ConversationSetup() {
             <button
               key={name}
               onClick={() => setAvatar(name)}
-              className={`flex flex-col items-center gap-2 rounded-xl border p-3 transition-colors ${
+              className={`flex flex-col items-center gap-2 rounded-2xl border p-3 transition-all ${
                 avatar === name
-                  ? "border-primary bg-primary/10"
-                  : "border-border hover:border-primary/50"
+                  ? "border-primary bg-primary/10 shadow-sm"
+                  : "border-border hover:border-primary/40 hover:bg-accent/50"
               }`}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={AVATAR_IMAGES[name]}
                 alt={name}
-                width={48}
-                height={48}
-                className="rounded-full"
+                width={52}
+                height={52}
+                className={`rounded-full transition-all ${
+                  avatar === name ? "ring-2 ring-primary ring-offset-1" : ""
+                }`}
               />
               <span className="text-xs font-medium">{name}</span>
             </button>
@@ -74,7 +78,7 @@ export function ConversationSetup() {
             placeholder={
               avatar ? `${avatar} – my session` : "Give this session a name"
             }
-            className="w-full rounded-xl border bg-background px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
+            className="w-full rounded-xl border border-border bg-card px-4 py-2.5 text-sm shadow-sm outline-none focus:ring-2 focus:ring-ring"
           />
         </div>
 
@@ -92,14 +96,14 @@ export function ConversationSetup() {
               if (e.key === "Enter") handleSubmit()
             }}
             placeholder="Your name"
-            className="w-full rounded-xl border bg-background px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
+            className="w-full rounded-xl border border-border bg-card px-4 py-2.5 text-sm shadow-sm outline-none focus:ring-2 focus:ring-ring"
           />
         </div>
 
         <button
           onClick={handleSubmit}
           disabled={!avatar || isPending}
-          className="w-full rounded-xl bg-primary py-2.5 text-sm font-medium text-primary-foreground shadow-sm disabled:opacity-50"
+          className="w-full rounded-2xl bg-primary py-3 text-sm font-semibold text-primary-foreground shadow-sm transition-opacity disabled:opacity-40"
         >
           {isPending ? "Starting..." : "Start conversation"}
         </button>

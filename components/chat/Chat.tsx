@@ -226,14 +226,24 @@ export function Chat({
     <div className="flex h-full flex-col">
       <CrisisButton ref={crisisButtonRef} />
       <QuickExit />
-      <div className="flex items-center justify-between border-b px-4 py-2">
-        <div className="flex items-center gap-3">
-          <span className="text-sm font-medium text-muted-foreground">
+      <div className="flex items-center justify-between border-b bg-sidebar/50 px-5 py-3">
+        <div className="flex items-center gap-2.5">
+          {avatar && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={`/avatars/${avatar.toLowerCase()}.png`}
+              alt={avatar}
+              width={28}
+              height={28}
+              className="rounded-full ring-2 ring-border"
+            />
+          )}
+          <span className="text-sm font-semibold text-foreground">
             {avatar ?? "Companion"}
           </span>
           <AboutButton />
         </div>
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-2">
           <span className="text-xs text-muted-foreground">Model</span>
           <select
             value={currentModelId}
@@ -248,7 +258,7 @@ export function Chat({
           </select>
         </div>
       </div>
-      <div className="flex-1 space-y-4 overflow-y-auto p-4">
+      <div className="flex-1 space-y-5 overflow-y-auto px-4 py-5">
         {switchNotice && (
           <p className="text-center text-xs text-muted-foreground">
             {switchNotice}
@@ -258,7 +268,7 @@ export function Chat({
           <MessageBubble key={m.id} message={m} avatar={avatar} />
         ))}
         {isStreaming && (
-          <div className="flex flex-row gap-2">
+          <div className="flex flex-row gap-3">
             <div className="flex-shrink-0 pt-1">
               {avatar ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -267,13 +277,13 @@ export function Chat({
                   alt={avatar}
                   width={32}
                   height={32}
-                  className="rounded-full"
+                  className="rounded-full ring-1 ring-border"
                 />
               ) : (
                 <div className="h-8 w-8 rounded-full bg-muted" />
               )}
             </div>
-            <div className="max-w-[75%] rounded-2xl bg-card px-4 py-2 text-sm shadow-sm">
+            <div className="max-w-[75%] rounded-2xl bg-muted/50 px-4 py-3 text-sm leading-relaxed shadow-sm">
               {streamingContent || <TypingIndicator />}
             </div>
           </div>
@@ -283,7 +293,7 @@ export function Chat({
         )}
         <div ref={bottomRef} />
       </div>
-      <div className="border-t p-4">
+      <div className="border-t bg-sidebar/30 px-4 py-3">
         <div className="flex items-end gap-2">
           <textarea
             value={input}
@@ -299,18 +309,29 @@ export function Chat({
               }
             }}
             onKeyDown={handleKeyDown}
-            placeholder="Type a message..."
+            placeholder="Share what's on your mind..."
             rows={1}
-            className="flex-1 resize-none rounded-xl border bg-background px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
+            className="flex-1 resize-none rounded-2xl border border-border bg-card px-4 py-3 text-sm leading-relaxed shadow-sm outline-none focus:ring-2 focus:ring-ring"
           />
           <button
             onClick={handleSubmit}
             disabled={!canSubmit}
-            className="rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50"
+            className="rounded-2xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-sm transition-opacity disabled:opacity-40"
           >
             Send
           </button>
         </div>
+        <p className="mt-2 text-center text-[10px] text-muted-foreground/60">
+          This companion is not a crisis service. In an emergency call{" "}
+          <a href="tel:911" className="underline">
+            911
+          </a>{" "}
+          or text/call{" "}
+          <a href="tel:988" className="underline">
+            988
+          </a>
+          .
+        </p>
       </div>
     </div>
   )
@@ -325,7 +346,7 @@ function MessageBubble({
 }) {
   if (message.role === "crisis") {
     return (
-      <div className="rounded-2xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+      <div className="rounded-2xl border border-destructive/30 bg-destructive/8 px-5 py-4 text-sm leading-relaxed text-destructive">
         {message.content}
       </div>
     )
@@ -333,7 +354,7 @@ function MessageBubble({
   const isUser = message.role === "user"
   const avatarSrc = avatar ? `/avatars/${avatar.toLowerCase()}.png` : null
   return (
-    <div className={`flex gap-2 ${isUser ? "flex-row-reverse" : "flex-row"}`}>
+    <div className={`flex gap-3 ${isUser ? "flex-row-reverse" : "flex-row"}`}>
       {!isUser && (
         <div className="flex-shrink-0 pt-1">
           {avatarSrc ? (
@@ -343,22 +364,24 @@ function MessageBubble({
               alt={avatar ?? ""}
               width={32}
               height={32}
-              className="rounded-full"
+              className="rounded-full ring-1 ring-border"
             />
           ) : (
             <div className="h-8 w-8 rounded-full bg-muted" />
           )}
         </div>
       )}
-      <div className="flex max-w-[75%] flex-col gap-1">
+      <div className="flex max-w-[72%] flex-col gap-1">
         {!isUser && avatar && (
-          <span className="px-1 text-xs text-muted-foreground">{avatar}</span>
+          <span className="px-1 text-xs font-medium text-muted-foreground">
+            {avatar}
+          </span>
         )}
         <div
-          className={`rounded-2xl px-4 py-2 text-sm ${
+          className={`rounded-2xl px-4 py-3 text-sm leading-relaxed ${
             isUser
               ? "bg-primary text-primary-foreground"
-              : "bg-card text-foreground shadow-sm"
+              : "bg-muted/50 text-foreground shadow-sm"
           }`}
         >
           {message.content}

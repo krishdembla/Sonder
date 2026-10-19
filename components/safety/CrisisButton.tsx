@@ -21,9 +21,14 @@ const CrisisButton = forwardRef<CrisisButtonHandle>(
         <button
           onClick={() => setOpen(true)}
           aria-label="Open crisis resources"
-          className="text-destructive-foreground fixed right-4 bottom-24 z-40 rounded-full bg-destructive px-4 py-2 text-sm font-medium shadow-lg"
+          className="fixed right-4 bottom-24 z-40 flex h-14 w-14 flex-col items-center justify-center rounded-full border-2 border-destructive bg-background shadow-lg transition-colors hover:bg-destructive/10"
         >
-          Crisis Resources
+          <span className="text-lg leading-none font-bold text-destructive">
+            SOS
+          </span>
+          <span className="mt-0.5 text-[9px] font-medium tracking-wide text-destructive/80">
+            HELP
+          </span>
         </button>
 
         {open && (

@@ -58,7 +58,7 @@ describe("Chat crisis follow-up timer", () => {
   it("appends CRISIS_FOLLOWUP after 45 s of silence following a crisis event", async () => {
     render(<Chat conversationId="c1" initialMessages={[]} />)
 
-    const textarea = screen.getByPlaceholderText("Type a message...")
+    const textarea = screen.getByPlaceholderText("Share what's on your mind...")
     fireEvent.change(textarea, { target: { value: "I want to die" } })
     fireEvent.keyDown(textarea, { key: "Enter" })
 
@@ -85,7 +85,7 @@ describe("Chat crisis follow-up timer", () => {
   it("does not append CRISIS_FOLLOWUP when the user replies before 45 s", async () => {
     render(<Chat conversationId="c1" initialMessages={[]} />)
 
-    const textarea = screen.getByPlaceholderText("Type a message...")
+    const textarea = screen.getByPlaceholderText("Share what's on your mind...")
     fireEvent.change(textarea, { target: { value: "I want to die" } })
     fireEvent.keyDown(textarea, { key: "Enter" })
 

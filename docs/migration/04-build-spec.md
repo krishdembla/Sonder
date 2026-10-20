@@ -88,14 +88,7 @@ These features existed in the old app but are intentionally not being built now.
 ---
 
 ## Slice 8: Clinician side
-Do not start this slice until Krish and Claude (chat) have written `docs/migration/05-clinician-spec.md` from the Phase 1 matrix. Planned parts, each its own session:
-- 8a Assignments and a clinician patient list.
-- 8b Session summary: concise, structured, generated for the clinician only (matrix: Kampman 2024, Rollwage 2023, Zou 2026; analogical).
-- 8c Reviewing AI replies before they reach the patient (therapist-in-the-loop mode).
-- 8d AI rationale shown with each draft, with edit and override.
-- 8e Tiered risk alert: interruptive for the highest risk, passive for lower; separate depression and suicide-risk alerts. Needs a `CrisisEvent` model storing a flag and timestamp, not the matched phrases. Evidence for the alert design is analogical; the chatbot-to-clinician handoff has no direct evidence.
-- 8f Feature flags for the open matrix cells (avatar, message pacing, alert style) so Phase 2 can compare variants.
-Data visibility: show patients a plain statement of what clinicians can see. The rules themselves are an open design question.
+Slice 8 is specified in docs/migration/05-clinician-spec.md
 
 ## Open decisions
 1. Hosting for deployed use, and how the app reaches Ollama and vLLM there (private network such as Tailscale, or a reverse proxy with auth). Ask Sagar or Ryan.

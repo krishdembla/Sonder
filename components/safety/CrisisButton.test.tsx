@@ -5,44 +5,8 @@ import { createRef } from "react"
 import { CrisisButton, type CrisisButtonHandle } from "./CrisisButton"
 
 describe("CrisisButton", () => {
-  it("renders the SOS button", () => {
+  it("renders nothing (no dialog) when closed", () => {
     render(<CrisisButton />)
-    expect(
-      screen.getByRole("button", { name: /open crisis resources/i })
-    ).toBeInTheDocument()
-  })
-
-  it("modal is not visible initially", () => {
-    render(<CrisisButton />)
-    expect(screen.queryByRole("dialog")).not.toBeInTheDocument()
-  })
-
-  it("opens modal when button is clicked", () => {
-    render(<CrisisButton />)
-    fireEvent.click(
-      screen.getByRole("button", { name: /open crisis resources/i })
-    )
-    expect(screen.getByRole("dialog")).toBeInTheDocument()
-    expect(screen.getByText(/you're not alone/i)).toBeInTheDocument()
-  })
-
-  it("lists 988, 741741, and 911 in the modal", () => {
-    render(<CrisisButton />)
-    fireEvent.click(
-      screen.getByRole("button", { name: /open crisis resources/i })
-    )
-    expect(screen.getByRole("link", { name: "988" })).toBeInTheDocument()
-    expect(screen.getByRole("link", { name: "741741" })).toBeInTheDocument()
-    expect(screen.getByRole("link", { name: "911" })).toBeInTheDocument()
-  })
-
-  it("closes modal when Close button is clicked", () => {
-    render(<CrisisButton />)
-    fireEvent.click(
-      screen.getByRole("button", { name: /open crisis resources/i })
-    )
-    expect(screen.getByRole("dialog")).toBeInTheDocument()
-    fireEvent.click(screen.getByRole("button", { name: /close/i }))
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument()
   })
 
@@ -54,5 +18,28 @@ describe("CrisisButton", () => {
       ref.current!.open()
     })
     expect(screen.getByRole("dialog")).toBeInTheDocument()
+    expect(screen.getByText(/you're not alone/i)).toBeInTheDocument()
+  })
+
+  it("lists 988, 741741, and 911 in the modal", () => {
+    const ref = createRef<CrisisButtonHandle>()
+    render(<CrisisButton ref={ref} />)
+    act(() => {
+      ref.current!.open()
+    })
+    expect(screen.getByRole("link", { name: "988" })).toBeInTheDocument()
+    expect(screen.getByRole("link", { name: "741741" })).toBeInTheDocument()
+    expect(screen.getByRole("link", { name: "911" })).toBeInTheDocument()
+  })
+
+  it("closes modal when Close button is clicked", () => {
+    const ref = createRef<CrisisButtonHandle>()
+    render(<CrisisButton ref={ref} />)
+    act(() => {
+      ref.current!.open()
+    })
+    expect(screen.getByRole("dialog")).toBeInTheDocument()
+    fireEvent.click(screen.getByRole("button", { name: /close/i }))
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument()
   })
 })

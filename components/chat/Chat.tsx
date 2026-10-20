@@ -279,6 +279,16 @@ export function Chat({
       </div>
       <div className="border-t bg-sidebar/30 px-4 py-3">
         <div className="flex items-end gap-2">
+          <button
+            onClick={() => crisisButtonRef.current?.open()}
+            aria-label="Open crisis resources"
+            className="flex flex-col items-center justify-center rounded-2xl border-2 border-destructive bg-background px-3 py-2.5 text-destructive shadow-sm transition-colors hover:bg-destructive/10"
+          >
+            <span className="text-xs leading-none font-bold">SOS</span>
+            <span className="mt-0.5 text-[9px] font-medium tracking-wide opacity-70">
+              HELP
+            </span>
+          </button>
           <textarea
             value={input}
             onChange={(e) => {
